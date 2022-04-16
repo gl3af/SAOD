@@ -1,5 +1,5 @@
-﻿#include <Windows.h>
-#include <iostream>
+﻿#include <iostream>
+#include <Windows.h>
 
 struct Item
 {
@@ -8,8 +8,6 @@ struct Item
 	int key;
 	int count = 1;
 } *root;
-
-bool isFound = false;
 
 void Init()
 {
@@ -28,33 +26,117 @@ int Input()
 	return a;
 }
 
-Item* FindValue(Item* node, int value)
+Item* getParent(int key)
 {
-	if (!isFound)
+	Item* parent = nullptr;
+	auto current = root;
+
+	while (current != nullptr)
 	{
-		if (node != nullptr)
+		if (key == current->key)
 		{
-			if (node->key == value)
-			{
-				isFound = true;
-				return node;
-			}
-			FindValue(node->left, value);
-			FindValue(node->right, value);
+			return parent;
+		}
+		else if (key < current->key)
+		{
+			parent = current;
+			current = current->left;
+		}
+		else
+		{
+			parent = current;
+			current = current->right;
 		}
 	}
 }
 
-void DeleteTree(Item* node)
+Item* Find(int key) 
 {
-	if (node == nullptr)
-		return;
-	DeleteTree(node->left);
-	DeleteTree(node->right);
-	delete node;
+	Item* parent = nullptr;
+	auto current = root;
+	bool found = false;
+
+	while (current != nullptr and !found)
+	{
+		if (key == current->key)
+		{
+			found = true;
+		}
+		else if (key < current->key)
+		{
+			parent = current;
+			current = current->left;
+		}
+		else
+		{
+			parent = current;
+			current = current->right;
+		}
+	}
+	return current;
 }
 
-Item* AddNode(Item* node, int key)
+void DeleteItem(int key)
+{
+	auto found = Find(key);
+	auto found_parent = getParent(key);
+
+	if (found->left == nullptr and found->right == nullptr) // нет потомков
+	{
+		if (key > found_parent->key) // вершина - правый потомок родителя
+			found_parent->right = nullptr;
+		else // вершина - левый потомок родителя
+			found_parent->left = nullptr;
+
+		delete found;
+	}
+	else if (found->left != nullptr and found->right != nullptr) // есть оба потомка
+	{
+		auto current = found->left; // левое поддерево
+		auto current_parent = found;
+		while (current->right != nullptr) // идём до конца вправо (ближайшее наименьшее)
+		{
+			current_parent = current;
+			current = current->right;
+		}
+		
+		found->key = current->key;
+		if (found != current_parent)
+			current_parent->right = nullptr;
+		else
+			current_parent->left = nullptr;
+
+		delete current;
+	}
+	else if (found->left != nullptr) // 1 потомок (левый)
+	{
+		if (key > found_parent->key) // вершина - правый потомок родителя
+		{
+			found_parent->right = found->left;
+			delete found;
+		}
+		else // вершина - левый потомок родителя
+		{
+			found_parent->left = found->left;
+			delete found;
+		}
+	}
+	else // 1 потомок (правый)
+	{
+		if (key > found_parent->key) // вершина - правый потомок родителя
+		{
+			found_parent->right = found->right;
+			delete found;
+		}
+		else // вершина - левый потомок родителя
+		{
+			found_parent->left = found->right;
+			delete found;
+		}
+	}
+}
+
+Item* AddNode(Item* node, int key) // рекурсивное добавление
 {
 	if (node == nullptr)
 	{
@@ -71,7 +153,7 @@ Item* AddNode(Item* node, int key)
 	return node;
 }
 
-void AddItem(int key)
+void AddItem(int key) // нерекурсивное добавление
 {
 	if (root == nullptr)
 	{
@@ -127,18 +209,28 @@ void ShowBackSymmetry(Item* node, int level = 0)
 	ShowBackSymmetry(node->right, level + 1);
 	for (int i = 0; i < level; i++)
 		std::cout << "\t";
-	std::cout << node->key << "\n";
+	std::cout << node->key << "(" << node->count << ")" << "\n";
 	ShowBackSymmetry(node->left, level + 1);
+}
+
+void DeleteTree(Item* node)
+{
+	if (node == nullptr)
+		return;
+	DeleteTree(node->left);
+	DeleteTree(node->right);
+	delete node;
 }
 
 void Menu()
 {
 	bool isWorking = true;
-	int choice, key, add_value, value;
+	int choice, value, key;
 	while (isWorking)
 	{
-		std::cout << "1. Вывод дерева в обратно-симметричном порядке\n2. Добавление новой вершины\n3. Удаление вершины с заданным значением ключа\n" 
-			<< "4. Поиск вершины с заданным значением ключа\n5. Вывод вершин в одну строку\n0. Выход\nВаш выбор: ";
+		std::cout << "1. Вывод дерева в обратно-симметричном порядке\n2. Добавление новой вершины\n" 
+			<< "3. Добавление заданного числа вершин со случайными значениями ключей\n4. Удаление вершины с заданным значением ключа\n" 
+			<< "5. Поиск вершины с заданным значением ключа\n6. Вывод вершин в одну строку\n0. Выход\nВаш выбор: ";
 		choice = Input();
 		if (choice == 0)
 			isWorking = false;
@@ -155,38 +247,79 @@ void Menu()
 		{
 			std::cout << "Введите значение ключа: ";
 			value = Input();
-			//root = AddNode(root, value); - рекурсия
-			for (int i = 0; i < 90; i++)
+			if (root != nullptr)
 			{
-				AddItem(rand() % 101);
+				while (true)
+				{
+					std::cout << "Добавить рекурсивно или нерекурсивно? (1 или 0): ";
+					key = Input();
+					if (key == 1)
+					{
+						AddNode(root, value);
+						
+					}
+					else if (key == 0)
+					{
+						AddItem(value);
+						break;
+					}
+					else
+						std::cout << "Команда отсутствует!\n";
+				}
 			}
+			else
+				AddItem(value);
+			std::cout << "Добавлено!\n";
 		}
 		else if (choice == 3)
 		{
 			if (root != nullptr)
 			{
-				
+				DeleteTree(root);
+				Init();
+			}
+			std::cout << "Введите число вершин: ";
+			value = Input();
+			for (int i = 0; i < value; i++)
+			{
+				AddItem(rand() % 101);
+			}
+			std::cout << "Выполнено!\n";
+		}
+		else if (choice == 4)
+		{
+			if (root != nullptr)
+			{
+				std::cout << "Введите ключ вершины: ";
+				value = Input();
+				DeleteItem(value);
 			}
 			else
 				std::cout << "Дерево пустое!\n";
 		}
-		else if (choice == 4)
+		else if (choice == 5)
 		{
 			std::cout << "Введите значение ключа: ";
 			value = Input();
-			FindValue(root, value);
-			if (isFound)
+			auto found = Find(value);
+			if (found != nullptr)
 			{
-				isFound = false;
-				auto found = FindValue(root, value);
 				std::cout << "Вершина с заданным значением присутствует!\n";
 				std::cout << "Кол-во появлений: " << found->count << "\n";
 			}
 			else
 				std::cout << "Вершина с заданным значением отсутствует!\n";
 		}
-		else if (choice == 5)
-			ShowLine(root);
+		else if (choice == 6)
+		{
+			if (root != nullptr)
+			{
+				ShowLine(root);
+				std::cout << "\n";
+			}
+			else
+				std::cout << "Дерево пустое!\n";
+		}
 		else
 			std::cout << "Команда отсутствует!\n";
 	}
@@ -194,11 +327,7 @@ void Menu()
 
 int main()
 {
-	int list[5];
-	for (auto item : list)
-	{
-
-	}
+	srand(static_cast<unsigned int>(time(0)));
 	Init();
 	SetConsoleCP(1251);
 	SetConsoleOutputCP(1251);

@@ -1,0 +1,4 @@
+﻿  1_3_2.cpp
+C:\Users\Nikita\Desktop\САОД\1_3_2\1_3_2.cpp(55,31): warning C4018: '<': signed/unsigned mismatch
+C:\Users\Nikita\Desktop\САОД\1_3_2\1_3_2.cpp(66,14): warning C4018: '>': signed/unsigned mismatch
+  1_3_2.vcxproj -> C:\Users\Nikita\Desktop\САОД\1_3_2\Debug\1_3_2.exe

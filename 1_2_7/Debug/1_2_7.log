@@ -1,0 +1,5 @@
+﻿  1_2_7.cpp
+C:\Users\Nikita\Desktop\САОД\1_2_7\1_2_7.cpp(107,15): warning C4244: 'argument': conversion from 'time_t' to 'unsigned int', possible loss of data
+C:\Users\Nikita\Desktop\САОД\1_2_7\1_2_7.cpp(123,34): warning C4018: '<': signed/unsigned mismatch
+C:\Users\Nikita\Desktop\САОД\1_2_7\1_2_7.cpp(146,38): warning C4018: '<': signed/unsigned mismatch
+  1_2_7.vcxproj -> C:\Users\Nikita\Desktop\САОД\1_2_7\Debug\1_2_7.exe

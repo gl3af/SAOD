@@ -1,0 +1,5 @@
+﻿  1_6_1.cpp
+C:\Users\Nikita\Desktop\САОД\1_6_1\1_6_1.cpp(137,19): warning C4101: 'add_value': unreferenced local variable
+C:\Users\Nikita\Desktop\САОД\1_6_1\1_6_1.cpp(137,14): warning C4101: 'key': unreferenced local variable
+C:\Users\Nikita\Desktop\САОД\1_6_1\1_6_1.cpp(46): warning C4715: 'FindValue': not all control paths return a value
+  1_6_1.vcxproj -> C:\Users\Nikita\Desktop\САОД\1_6_1\Debug\1_6_1.exe
